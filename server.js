@@ -2,11 +2,15 @@ const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
+const connectDB = require('./config/db');
 
 // Init server
 const app = express();
 app.use(cors());
 const server = http.createServer(app);
+
+// Connect DB
+connectDB();
 
 // Init middleware
 app.use(express.json());
