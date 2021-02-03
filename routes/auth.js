@@ -4,50 +4,50 @@ const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const auth = require('../middlewares/auth');
 
-// @route   POST api/users
-// @desc    Register a user
+// @route   GET api/auth
+// @desc    Get logged in user
+// @access  Private
+router.get('/', auth, async(req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        res.json(user);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   POST api/auth
+// @desc    Auth user & get token
 // @access  Public
 router.post(
     '/', [
-        check('fullname', 'Please add name').not().isEmpty(),
         check('username', 'Please include a valid username').not().isEmpty(),
-        check(
-            'password',
-            'Please enter a password with 6 or more characters'
-        ).isLength({ min: 6 }),
+        check('password', 'Password is required').exists(),
     ],
     async(req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-
-        const { fullname, username, password } = req.body;
-
+        const { username, password } = req.body;
         try {
             let user = await User.findOne({ username });
-
-            if (user) {
-                return res.status(400).json({ msg: 'User already exists' });
+            if (!user) {
+                return res.status(400).json({ msg: 'Invalid Credentials' });
             }
-
-            user = new User({
-                fullname,
-                username,
-                password,
-            });
-
-            const salt = await bcrypt.genSalt(10);
-            user.password = await bcrypt.hash(password, salt);
-            await user.save();
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) {
+                return res.status(400).json({ msg: 'Invalid Credentials' });
+            }
 
             const payload = {
                 user: {
                     id: user.id,
                 },
             };
-
             jwt.sign(
                 payload,
                 process.env.JWT_SECRET, {
@@ -60,7 +60,7 @@ router.post(
             );
         } catch (err) {
             console.error(err.message);
-            res.status(500).send('Server error...');
+            res.status(500).send('Server Error');
         }
     }
 );
