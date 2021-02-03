@@ -28,6 +28,9 @@ app.use(function(req, res, next) {
 });
 app.use(passport.initialize());
 
+//Define routes
+app.use("/api/users", require("./routes/users"));
+
 server.listen(process.env.PORT || 5000, () =>
     console.log(`Server has started.`)
 );
