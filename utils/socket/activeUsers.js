@@ -10,7 +10,7 @@ const addUser = ({ id, name }) => {
 };
 
 const removeUser = ({ id, name }) => {
-    const index;
+    let index;
     if (id) {
         index = users.findIndex((user) => user.id === id);
     } else if (name) {
@@ -33,4 +33,4 @@ const getUserById = (id) => users.find((user) => user.id === id);
 
 const getUserByName = (name) => users.find((user) => user.name === name);
 
-modulde.exports = { addUser, removeUser, getUsers, getUserById, getUserByName };
+module.exports = { addUser, removeUser, getUsers, getUserById, getUserByName };

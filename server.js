@@ -32,6 +32,14 @@ app.use(passport.initialize());
 app.use('/api/users', require('./routes/users'));
 app.use('/api/auth', require('./routes/auth'));
 
+// Connect socket.io
+const socketio = require('socket.io');
+const options = { /*... */ };
+const io = socketio(server, options);
+const { initSocket } = require('./utils/socket');
+
+initSocket({ io });
+
 server.listen(process.env.PORT || 5000, () =>
     console.log(`Server has started.`)
 );
