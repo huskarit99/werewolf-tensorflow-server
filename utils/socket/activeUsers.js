@@ -14,7 +14,8 @@ const removeUser = ({ id, name }) => {
     if (id) {
         index = users.findIndex((user) => user.id === id);
     } else if (name) {
-        index = users.findIndex((user) => user.name === user.name);
+      
+        index = users.findIndex((user) => user.name === name);
     } else return;
 
     if (index === -1) {

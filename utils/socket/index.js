@@ -1,5 +1,5 @@
 const { addUser, getUsers, removeUser, getUserById, setUserInRoom } = require('./activeUsers');
-const { addRoom, getRooms, removeRoom, getRoomById, getQuickRooms } = require('./rooms');
+const { addRoom, getRooms, removeRoom, getRoomById, getQuickRooms, updaWaitRoom } = require('./rooms');
 
 const initSocket = ({ io }) => {
     io.on('connection', (socket) => {
@@ -22,6 +22,7 @@ const initSocket = ({ io }) => {
 
         // Client is offline
         socket.on('removeOnlineStatus', ({ name }) => {
+          console.log(name);
             removeUser({ name: name });
             io.emit('getOnlineUsers', { users: getUsers() });
             console.log(`User ${name} has offline.`);
@@ -41,27 +42,29 @@ const initSocket = ({ io }) => {
         });
 
         // Reload room list
-    socket.emit('getRooms', { rooms: getRooms() });
+    io.emit('getRooms', { rooms: getRooms() });
 
+    
     // Set game room 
-    socket.on("joinRoom", ({ roomId, roomName, roomLevel }, callback) => {
+    socket.on("joinRoom", ({ roomId, roomName, numOfPlayers }, callback) => {
       const host = getUserById(socket.id);
       // Add a room to room list if this room is not available
-      addRoom({ id: socket.id, room: roomId, name: roomName, level: roomLevel, host });
+      addRoom({ id: socket.id, room: roomId, name: roomName, numOfPlayers: numOfPlayers, host, numOfWaiting: 0 });
 
       const { user, room, error } = setUserInRoom({ id: socket.id, room: roomId });
 
       // Join room by socket
       socket.join(roomId);
-
+      updaWaitRoom(roomId);
+      // Broadcast to all user about room info
+      io.emit('getRooms', { rooms: getRooms()});
       if (error) return;
 
       // Send message to chat box
       socket.emit('message', { user: 'admin', text: `${user.name}, welcome to room ${roomName}.` });
       socket.broadcast.to(user.room).emit('message', { user: 'admin', text: `${user.name} has joined!` });
 
-      // Broadcast to all user about room info
-      io.emit('getRooms', { rooms: getRooms() });
+      
 
       console.log(`[${socket.id}] Client has joined room [${roomName}].`);
 
