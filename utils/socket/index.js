@@ -95,6 +95,7 @@ const initSocket = ({ io }) => {
       callback();
     });
 
+    //Requet quick game
     socket.on('requestQuickGame', () => {
       // all rooms -> find rooms with status = "quickly"
       // if exist -> join first item
@@ -122,7 +123,18 @@ const initSocket = ({ io }) => {
       console.log(quickRoom);
       io.to(quickRoom.id).emit('quickRoom', { room: quickRoom });
     });
+
+    //Request join room with code
+    socket.on('requestJoinRoomByCode', (roomId)=>{
+      console.log(roomId);
+      const room = getRooms().find((room)=> room.id == roomId);
+      console.log(room);
+      io.to(socket.id).emit('joinRoomByCode',{room:room});
     })
+
+    })
+
+    
 }
 
 module.exports = { initSocket };

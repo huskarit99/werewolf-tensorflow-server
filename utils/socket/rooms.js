@@ -7,7 +7,14 @@ const getRooms = () => rooms;
 const updaWaitRoom = (id)=>{
   rooms.find((room)=>{
     if(room.id===id){
-      room.numOfWaiting+=1;
+      if(room.numOfWaiting<room.numOfPlayers)
+        {
+          room.numOfWaiting+=1;
+        }
+      else
+        {
+          return false;
+        }
     }
   })
 }
