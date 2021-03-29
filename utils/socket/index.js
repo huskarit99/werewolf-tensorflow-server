@@ -44,31 +44,30 @@ const initSocket = ({ io }) => {
         // Reload room list
     io.emit('getRooms', { rooms: getRooms() });
 
-    
     // Set game room 
     socket.on("joinRoom", ({ roomId, roomName, numOfPlayers }, callback) => {
       const host = getUserById(socket.id);
       // Add a room to room list if this room is not available
-      addRoom({ id: socket.id, room: roomId, name: roomName, numOfPlayers: numOfPlayers, host, numOfWaiting: 0 });
+      addRoom({ id: socket.id, room: roomId, name: roomName, numOfPlayers: numOfPlayers, host: host, numOfWaiting: 0 });
 
       const { user, room, error } = setUserInRoom({ id: socket.id, room: roomId });
-
+     
       // Join room by socket
       socket.join(roomId);
-      updaWaitRoom(roomId);
+      //update players waiting room
+      updaWaitRoom({name: host.name, roomId});
       // Broadcast to all user about room info
       io.emit('getRooms', { rooms: getRooms()});
-      if (error) return;
+      io.emit('waitingRoom',{room:room})
+      if (error) return error;
 
       // Send message to chat box
       socket.emit('message', { user: 'admin', text: `${user.name}, welcome to room ${roomName}.` });
       socket.broadcast.to(user.room).emit('message', { user: 'admin', text: `${user.name} has joined!` });
 
-      
-
       console.log(`[${socket.id}] Client has joined room [${roomName}].`);
 
-      callback(user, room);
+      callback(room.host, room, error);
     });
 
     socket.on('reloadRooms', () => {
@@ -88,7 +87,7 @@ const initSocket = ({ io }) => {
     socket.on('sendMatchInfo', (params, callback) => {
       const user = getUserById(socket.id);
       // 
-      const room = getRoomById(user.room);
+      //const room = getRoomById(user.room);
 
       socket.broadcast.to(user.room).emit('matchInfo', { user: `${user.name}`, data: params });
 
@@ -126,9 +125,7 @@ const initSocket = ({ io }) => {
 
     //Request join room with code
     socket.on('requestJoinRoomByCode', (roomId)=>{
-      console.log(roomId);
       const room = getRooms().find((room)=> room.id == roomId);
-      console.log(room);
       io.to(socket.id).emit('joinRoomByCode',{room:room});
     })
 

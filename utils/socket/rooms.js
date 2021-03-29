@@ -4,9 +4,12 @@ const { addUser, getUsers, removeUser, getUserById, setUserInRoom } = require('.
 rooms = [];
 
 const getRooms = () => rooms; 
-const updaWaitRoom = (id)=>{
+const updaWaitRoom = ({name, roomId})=>{
   rooms.find((room)=>{
-    if(room.id===id){
+    if(room.id===roomId){
+      if(room.players.find(player=>player.name===name))
+        return {error: "Player already in room"};
+      else{
       if(room.numOfWaiting<room.numOfPlayers)
         {
           room.numOfWaiting+=1;
@@ -15,6 +18,7 @@ const updaWaitRoom = (id)=>{
         {
           return false;
         }
+      }
     }
   })
 }
@@ -25,8 +29,8 @@ const addRoom = ({ id, room, name, numOfPlayers, host, players=[], status = "wai
   const exitingRoom = getRoomById(room);
   if (exitingRoom) return { error: `Room ${name} is exist` };
 
-  const newRoom = { id: room, name, numOfPlayers, host: host, players, status, numOfWaiting};
-
+  const newRoom = { id: room, name, numOfPlayers, host, players, status, numOfWaiting: numOfWaiting+1};
+  
   rooms.push(newRoom);
 
   console.log(`Room ${name} is created.`)
@@ -34,7 +38,10 @@ const addRoom = ({ id, room, name, numOfPlayers, host, players=[], status = "wai
   return { user: host, room: newRoom };
 };
 
-const getRoomById = (id) => rooms.find((room) => room.id === id);
+const getRoomById = (id) =>{
+  const room = rooms.find((room) => room.id === id);
+  return room;
+} 
 
 const removeRoom = ({ id }) => {
   const index = rooms.findIndex((room) => room.id === id);
