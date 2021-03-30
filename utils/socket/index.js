@@ -46,6 +46,7 @@ const initSocket = ({ io }) => {
 
     // Set game room 
     socket.on("joinRoom", ({ roomId, roomName, numOfPlayers }, callback) => {
+      
       const host = getUserById(socket.id);
       // Add a room to room list if this room is not available
       addRoom({ id: socket.id, room: roomId, name: roomName, numOfPlayers: numOfPlayers, host: host, numOfWaiting: 0 });
@@ -54,8 +55,13 @@ const initSocket = ({ io }) => {
      
       // Join room by socket
       socket.join(roomId);
+      
+      io.emit('gameInfo',{room});
       //update players waiting room
-      updaWaitRoom({name: host.name, roomId});
+      if(host)
+      {
+        updaWaitRoom({name: host.name, roomId});
+      }
       // Broadcast to all user about room info
       io.emit('getRooms', { rooms: getRooms()});
       io.emit('waitingRoom',{room:room})
@@ -69,6 +75,15 @@ const initSocket = ({ io }) => {
 
       callback(room.host, room, error);
     });
+
+    //setting room
+    socket.on('gameSetting',({gameSetting, roomId})=>{
+      const room = getRoomById(roomId);
+      if(room){
+        room.gameSetting = gameSetting;
+        io.emit('gameInfo',{room});
+      }
+    })
 
     socket.on('reloadRooms', () => {
       io.emit('getRooms', { rooms: getRooms() });
@@ -86,9 +101,7 @@ const initSocket = ({ io }) => {
     // When someone send match info
     socket.on('sendMatchInfo', (params, callback) => {
       const user = getUserById(socket.id);
-      // 
-      //const room = getRoomById(user.room);
-
+      //const room = getRoomById(user.room)
       socket.broadcast.to(user.room).emit('matchInfo', { user: `${user.name}`, data: params });
 
       callback();

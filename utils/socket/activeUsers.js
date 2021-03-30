@@ -55,7 +55,6 @@ const setUserInRoom = ({ id, room }) => {
         else return { error: "Player already exists in room!" };
       }
     }
-    console.log(exitingRoom.players);
     if (user && exitingRoom) return { user, room: exitingRoom };
   } catch (error) {
     return { error };
