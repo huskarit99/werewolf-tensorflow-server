@@ -5,23 +5,19 @@ rooms = [];
 
 const getRooms = () => rooms; 
 const updaWaitRoom = ({name, roomId})=>{
-  rooms.find((room)=>{
-    if(room.id===roomId){
-      if(room.players.find(player=>player.name===name))
-        return {error: "Player already in room"};
-      else{
+  const room = rooms.find((room)=>room.id==roomId);
+    if(room){
       if(room.numOfWaiting<room.numOfPlayers)
         {
           room.numOfWaiting+=1;
+          console.log(room.numOfWaiting);
         }
       else
         {
-          return false;
+          return {error: "Room is full"};
         }
-      }
     }
-  })
-}
+  };
 
 const addRoom = ({ id, room, name, numOfPlayers, host, players=[], status = "waiting", numOfWaiting }) => {
   // Id is unique because it is mapped with socket id of room creator
@@ -29,7 +25,7 @@ const addRoom = ({ id, room, name, numOfPlayers, host, players=[], status = "wai
   const exitingRoom = getRoomById(room);
   if (exitingRoom) return { error: `Room ${name} is exist` };
 
-  const newRoom = { id: room, name, numOfPlayers, host, players, status, numOfWaiting: numOfWaiting+1};
+  const newRoom = { id: room, name, numOfPlayers, host, players, status, numOfWaiting};
   
   rooms.push(newRoom);
 

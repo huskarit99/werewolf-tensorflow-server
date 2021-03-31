@@ -28,6 +28,7 @@ const initSocket = ({ io }) => {
             console.log(`User ${name} has offline.`);
         });
 
+      
         // Client is disconnected
 
         socket.on('disconnected', () => {
@@ -43,7 +44,10 @@ const initSocket = ({ io }) => {
 
         // Reload room list
     io.emit('getRooms', { rooms: getRooms() });
-
+    // Load room for socket
+    socket.on('reloadRooms', () => {
+      socket.emit('getRooms', { rooms: getRooms() });
+    });
     // Set game room 
     socket.on("joinRoom", ({ roomId, roomName, numOfPlayers }, callback) => {
       
@@ -56,38 +60,37 @@ const initSocket = ({ io }) => {
       // Join room by socket
       socket.join(roomId);
       
-      io.emit('gameInfo',{room});
-      //update players waiting room
+      //update players in room
       if(host)
       {
         updaWaitRoom({name: host.name, roomId});
+        
       }
+      io.in(roomId).emit('gameInfo',{room});
       // Broadcast to all user about room info
       io.emit('getRooms', { rooms: getRooms()});
-      io.emit('waitingRoom',{room:room})
+      //io.emit('waitingRoom',{room:room})
       if (error) return error;
 
       // Send message to chat box
       socket.emit('message', { user: 'admin', text: `${user.name}, welcome to room ${roomName}.` });
       socket.broadcast.to(user.room).emit('message', { user: 'admin', text: `${user.name} has joined!` });
-
+      //setting room
+      socket.on('gameSetting',({gameSetting, roomId})=>{
+      const room = getRoomById(roomId);
+      if(room){
+        room.gameSetting = gameSetting;
+        io.in(roomId).emit('gameInfo',{room});
+      }
+    })
       console.log(`[${socket.id}] Client has joined room [${roomName}].`);
 
       callback(room.host, room, error);
     });
 
-    //setting room
-    socket.on('gameSetting',({gameSetting, roomId})=>{
-      const room = getRoomById(roomId);
-      if(room){
-        room.gameSetting = gameSetting;
-        io.emit('gameInfo',{room});
-      }
-    })
+    
 
-    socket.on('reloadRooms', () => {
-      io.emit('getRooms', { rooms: getRooms() });
-    });
+    
 
     // When someone send message
     socket.on('sendMessage', (message, callback) => {
