@@ -57,10 +57,7 @@ const initSocket = ({ io }) => {
 
       const { user, room, error } = setUserInRoom({ id: socket.id, room: roomId });
       if (error) {
-        console.log(error)
-
-        io.to(socket.id).emit('roomBlock',{error});
-        console.log(error)
+        socket.emit('roomBlock',{error});
         return {error};
       }
 
@@ -100,6 +97,7 @@ const initSocket = ({ io }) => {
             const index = room.players.findIndex((x) => x.id == socket.id);
             if (index > -1) {
               room.players.splice(index, 1);
+              room.players[index].status = null;
             }
           }
           room.numOfWaiting--;
@@ -109,6 +107,9 @@ const initSocket = ({ io }) => {
               .to(user.room)
               .emit("message", { user: "", text: `${user.name} has left!` });
           io.emit("getRooms", { rooms: getRooms() });
+          socket.on('reloadRooms', () => {
+            socket.emit('getRooms', { rooms: getRooms() });
+          });
         }
       })
 
@@ -129,15 +130,26 @@ const initSocket = ({ io }) => {
           .emit("message", { user: "", text: `${player.name} was kicked!` }); 
         io.emit("getRooms", { rooms: getRooms() });
         io.to(player.id).emit('isKicked');
+      });
+      //set player is ready
+      socket.on('setReady', ()=>{
+        const index = room.players.findIndex((player)=>player.id===socket.id);
+        room.players[index].status = 'ready';
+        io.in(roomId).emit("gameInfo", { room, error });
+
+      });
+      // set player is unready
+      socket.on('setUnReady', ()=>{
+        const index = room.players.findIndex((player)=>player.id===socket.id);
+        room.players[index].status = 'waiting';
+        io.in(roomId).emit("gameInfo", { room, error });
       })
     });
 
     // When someone send message
     socket.on('sendMessage', (message, callback) => {
       const user = getUserById(socket.id);
-
       io.to(user.room).emit('message', { user: `${user.name}`, text: message });
-
       callback();
     });
 
