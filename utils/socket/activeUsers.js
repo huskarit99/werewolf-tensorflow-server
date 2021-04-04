@@ -36,26 +36,36 @@ const getUserByName = (name) => users.find((user) => user.name === name);
 
 const setUserInRoom = ({ id, room }) => {
   try {
-    if (!room) return { error: "room is required." };
+    if (!room) return { error: "roomCode is required." };
     if (!id) return { error: "UserId is required." };
     const user = getUserById(id);
-
+    const existingRoom = getRoomById(room);
+    if(existingRoom.block)
+    { 
+      const index = existingRoom.block.find((player)=>player.name==user.name);
+      if(index)
+      {
+        return { error:"You are not allowed to join this room!"}
+      }
+    }
     if (user) {
       user.room = room;
     }
-
     // Calculate role
-    const exitingRoom = getRoomById(room);
-    if (exitingRoom) {
-      if (exitingRoom.numOfPlayers === exitingRoom.numOfWaiting) {
-        exitingRoom.status = "playing";
-      } else {
-        if (!exitingRoom.players.find((player) => player.id === user.id))
-          exitingRoom.players.push(user);
+    if (existingRoom) {
+      if (existingRoom.numOfPlayers-1 === existingRoom.numOfWaiting) {
+        existingRoom.status = "full";  
+      } 
+        if (!existingRoom.players.find((player) => player.id === user.id))
+          {
+            existingRoom.players.push(user);
+            existingRoom.numOfWaiting+=1;
+          }
+
         else return { error: "Player already exists in room!" };
-      }
+      
     }
-    if (user && exitingRoom) return { user, room: exitingRoom };
+    if (user && existingRoom) return { user, room: existingRoom };
   } catch (error) {
     return { error };
   }

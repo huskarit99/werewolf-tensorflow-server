@@ -49,48 +49,88 @@ const initSocket = ({ io }) => {
       socket.emit('getRooms', { rooms: getRooms() });
     });
     // Set game room 
-    socket.on("joinRoom", ({ roomId, roomName, numOfPlayers }, callback) => {
+    socket.on("joinRoom", ({ roomId, roomName, numOfPlayers }) => {
       
-      const host = getUserById(socket.id);
+      let host = getUserById(socket.id);
       // Add a room to room list if this room is not available
-      addRoom({ id: socket.id, room: roomId, name: roomName, numOfPlayers: numOfPlayers, host: host, numOfWaiting: 0 });
+      addRoom({room: roomId, name: roomName, numOfPlayers: numOfPlayers, host: host, numOfWaiting: 0 });
 
       const { user, room, error } = setUserInRoom({ id: socket.id, room: roomId });
-     
+      if (error) {
+        console.log(error)
+
+        io.to(socket.id).emit('roomBlock',{error});
+        console.log(error)
+        return {error};
+      }
+
       // Join room by socket
       socket.join(roomId);
       
-      //update players in room
-      if(host)
-      {
-        updaWaitRoom({name: host.name, roomId});
-        
-      }
-      io.in(roomId).emit('gameInfo',{room});
+      io.in(roomId).emit('gameInfo',{room, error});
       // Broadcast to all user about room info
       io.emit('getRooms', { rooms: getRooms()});
-      //io.emit('waitingRoom',{room:room})
-      if (error) return error;
 
       // Send message to chat box
       socket.emit('message', { user: 'admin', text: `${user.name}, welcome to room ${roomName}.` });
       socket.broadcast.to(user.room).emit('message', { user: 'admin', text: `${user.name} has joined!` });
       //setting room
       socket.on('gameSetting',({gameSetting, roomId})=>{
-      const room = getRoomById(roomId);
-      if(room){
-        room.gameSetting = gameSetting;
-        io.in(roomId).emit('gameInfo',{room});
-      }
-    })
-      console.log(`[${socket.id}] Client has joined room [${roomName}].`);
+        const room = getRoomById(roomId);
+        if(room){
+          room.gameSetting = gameSetting;
+          io.in(roomId).emit('gameInfo',{room, error});
+        }
+      })
+      //exit room
+      socket.on('exitRoom', ({host,roomId})=>{
+        const room = getRoomById(roomId);
+        if (room) {
+          socket.leave(roomId);
+          if (socket.id == host.id) {
+            if (room.players.length > 1) {
+              room.players.splice(0,1);
+              room.host = room.players[0];
+              
+            } else {
+              removeRoom(roomId);
+            }
 
-      callback(room.host, room, error);
+          } else {
+            const index = room.players.findIndex((x) => x.id == socket.id);
+            if (index > -1) {
+              room.players.splice(index, 1);
+            }
+          }
+          room.numOfWaiting--;
+          room.status = 'waiting';
+          io.in(roomId).emit("gameInfo", { room, error });
+            socket.broadcast
+              .to(user.room)
+              .emit("message", { user: "", text: `${user.name} has left!` });
+          io.emit("getRooms", { rooms: getRooms() });
+        }
+      })
+
+      //kick player in room
+      socket.on('kickPlayer',player=>{
+        room.block.push(player);
+        
+        const index = room.players.findIndex((x) => x.name == player.name);
+        if (index > -1) {
+          room.players.splice(index, 1);
+        }
+        room.numOfWaiting--;
+        room.status = "waiting";
+        
+        io.in(roomId).emit("gameInfo", { room, error });
+        socket.broadcast
+          .to(user.room)
+          .emit("message", { user: "", text: `${player.name} was kicked!` }); 
+        io.emit("getRooms", { rooms: getRooms() });
+        io.to(player.id).emit('isKicked');
+      })
     });
-
-    
-
-    
 
     // When someone send message
     socket.on('sendMessage', (message, callback) => {
