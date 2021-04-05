@@ -97,7 +97,7 @@ const initSocket = ({ io }) => {
             const index = room.players.findIndex((x) => x.id == socket.id);
             if (index > -1) {
               room.players.splice(index, 1);
-              room.players[index].status = null;
+              user.status=null;
             }
           }
           room.numOfWaiting--;
@@ -120,16 +120,16 @@ const initSocket = ({ io }) => {
         const index = room.players.findIndex((x) => x.name == player.name);
         if (index > -1) {
           room.players.splice(index, 1);
+          user.status=null;
         }
         room.numOfWaiting--;
         room.status = "waiting";
-        
+        io.to(player.id).emit('isKicked');
         io.in(roomId).emit("gameInfo", { room, error });
         socket.broadcast
           .to(user.room)
           .emit("message", { user: "", text: `${player.name} was kicked!` }); 
         io.emit("getRooms", { rooms: getRooms() });
-        io.to(player.id).emit('isKicked');
       });
       //set player is ready
       socket.on('setReady', ()=>{

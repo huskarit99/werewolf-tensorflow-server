@@ -38,7 +38,6 @@ const setUserInRoom = ({ id, room }) => {
   try {
     if (!room) return { error: "roomCode is required." };
     if (!id) return { error: "UserId is required." };
-    const user = getUserById(id);
     const existingRoom = getRoomById(room);
     if(existingRoom.block)
     { 
@@ -48,6 +47,7 @@ const setUserInRoom = ({ id, room }) => {
         return { error:"You are not allowed to join this room!"}
       }
     }
+    const user = getUserById(id);
     if (user) {
       user.room = room;
     }
