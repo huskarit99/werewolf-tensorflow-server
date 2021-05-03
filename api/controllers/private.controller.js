@@ -10,23 +10,48 @@ const router = express.Router();
 // @route   GET api/user
 // @desc    Get info user by token
 // @access  Private
-router.get('/user', auth, async (req, res) => {
-  const resultGetUser = await userService.getUserById(req.user.id);
-  if (resultGetUser.code === operatorType.FAIL.READ) {
-    res.status(httpStatusCode.SERVER_ERRORS.INTERNAL_SERVER_ERROR).
-      send(resultGetUser);
-    return;
-  }
-  res.status(httpStatusCode.SUCCESS.OK).send(resultGetUser);
-});
+router.get(
+  '/user',
+  auth,
+  async (req, res) => {
+    const resultGetUser = await userService.getUserById(req.user.id);
+    if (resultGetUser.code === operatorType.FAIL.READ) {
+      res.status(httpStatusCode.SERVER_ERRORS.INTERNAL_SERVER_ERROR)
+        .send(resultGetUser)
+        .end();
+      return;
+    }
+    res.status(httpStatusCode.SUCCESS.OK).send(resultGetUser);
+  });
+
+// @route   PUT api/user
+// @desc    update info user
+// @access  Private
+router.put(
+  '/user',
+  auth,
+  async (req, res) => {
+    const { fullname, password } = req.body;
+    const resultUpdateUser = await userService.updateUser(fullname, password, req.user.id);
+    if (!resultUpdateUser.isSuccess) {
+      res.status(httpStatusCode.CLIENT_ERRORS.BAD_REQUEST)
+        .send(resultUpdateUser)
+        .end();
+      return;
+    }
+    res.status(httpStatusCode.SUCCESS.OK).send(resultUpdateUser);
+  });
 
 // @route   GET api/auth
 // @desc    Validate token
 // @access  Private
-router.post('/auth-token', auth, async (req, res) => {
-  res.status(httpStatusCode.SUCCESS.OK).json({
-    isSuccess: true
-  })
-});
+router.post(
+  '/auth-token',
+  auth,
+  async (req, res) => {
+    res.status(httpStatusCode.SUCCESS.OK).json({
+      isSuccess: true
+    })
+  });
 
 export default router;

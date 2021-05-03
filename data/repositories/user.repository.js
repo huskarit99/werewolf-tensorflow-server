@@ -3,8 +3,7 @@ import operatorType from '../../utils/enums/operatorType.js';
 
 const userRepository = {
   //CREATE
-  addUser(fullname, username, password) {
-    const user = new User(fullname, username, password);
+  addUser(user) {
     return user.save().catch(() =>
       operatorType.FAIL.CREATE
     );
@@ -28,8 +27,10 @@ const userRepository = {
   },
 
   //UPDATE
-  updateUser() {
-
+  updateUser(user) {
+    return user.save().catch(() =>
+      operatorType.FAIL.UPDATE
+    );
   },
 
   //DELETE

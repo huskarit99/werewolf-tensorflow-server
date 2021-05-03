@@ -4,9 +4,11 @@ import operatorType from "../../utils/enums/operatorType.js";
 import jwtGenerator from "../../api/security/jwtGenerator.js";
 import signInValidator from "../../api/validators/signInValidator.js";
 import signUpValidator from "../../api/validators/signUpValidator.js";
+import updateValidator from "../../api/validators/updateValidator.js";
 import userRepository from "../../data/repositories/user.repository.js";
 import signInResponseEnum from "../../utils/enums/signInResponseEnum.js";
 import signUpResponseEnum from "../../utils/enums/signUpResponseEnum.js";
+import updateResponseEnum from '../../utils/enums/updateResponseEnum.js';
 
 const userService = {
   async signin(username, password) {
@@ -68,7 +70,8 @@ const userService = {
     // Save user to DB
     const salt = await bcrypt.genSalt(10);
     password = await bcrypt.hash(password, salt);
-    const createUser = await userService.addUser(fullname, username, password);
+    user = new User(fullname, username, password);
+    const createUser = await userService.addUser(user);
     if (createUser === operatorType.FAIL.CREATE)
       return {
         isSuccess: false,
@@ -113,6 +116,35 @@ const userService = {
       isSuccess: true,
       user: user,
       code: operatorType.SUCCESS.READ
+    }
+  },
+  async updateUser(fullname, password, id) {
+    // validate request
+    const resultUpdateValidator = updateValidator(fullname, password);
+    if (!resultUpdateValidator.isSuccess)
+      return resultUpdateValidator;
+    // get user by token
+    const user = await userRepository.getUserById(id);
+    if (user === operatorType.FAIL.READ) {
+      return {
+        isSuccess: false,
+        code: updateResponseEnum.SERVER_ERROR
+      }
+    }
+    const salt = await bcrypt.genSalt(10);
+    password = await bcrypt.hash(password, salt);
+    user.fullname = fullname;
+    user.password = password;
+    const resultUpdateUser = await userRepository.updateUser(user);
+    if (resultUpdateUser === operatorType.FAIL.UPDATE)
+      return {
+        isSuccess: false,
+        code: updateResponseEnum.SERVER_ERROR
+      }
+    return {
+      isSuccess: true,
+      user: user,
+      code: updateResponseEnum.SUCCESS
     }
   }
 }

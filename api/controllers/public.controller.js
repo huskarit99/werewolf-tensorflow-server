@@ -15,10 +15,7 @@ router.post(
     const signupResult = userService.signup(fullname, username, password);
     if (!signupResult.isSuccess) {
       res.status(httpStatusCode.CLIENT_ERRORS.BAD_REQUEST)
-        .json({
-          isSuccess: false,
-          code: signupResult.code
-        })
+        .send(signupResult)
         .end();
       return;
     }
@@ -37,10 +34,7 @@ router.post(
     const signinResult = await userService.signin(username, password);
     if (!signinResult.isSuccess) {
       res.status(httpStatusCode.CLIENT_ERRORS.BAD_REQUEST)
-        .json({
-          isSuccess: false,
-          code: signinResult.code
-        })
+        .send(signinResult)
         .end();
       return;
     }
