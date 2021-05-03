@@ -54,4 +54,21 @@ router.post(
     })
   });
 
+// @route   GET api/users
+// @desc    Get all users
+// @access  Private
+router.get(
+  '/users',
+  auth,
+  async (req, res) => {
+    const resultGetAllUsers = await userService.getAllUsers();
+    if (resultGetAllUsers.code === operatorType.FAIL.READ) {
+      res.status(httpStatusCode.SERVER_ERRORS.INTERNAL_SERVER_ERROR)
+        .send(resultGetAllUsers)
+        .end();
+      return;
+    }
+    res.status(httpStatusCode.SUCCESS.OK).send(resultGetAllUsers);
+  });
+
 export default router;

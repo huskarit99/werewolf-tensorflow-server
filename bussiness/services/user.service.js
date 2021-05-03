@@ -149,6 +149,19 @@ const userService = {
       user: user,
       code: updateResponseEnum.SUCCESS
     }
+  },
+  async getAllUsers() {
+    const users = await userRepository.getUsers();
+    if (users === operatorType.FAIL.READ)
+      return {
+        isSuccess: false,
+        code: operatorType.FAIL.READ
+      }
+    return {
+      isSuccess: true,
+      code: operatorType.SUCCESS.READ,
+      users: users
+    }
   }
 }
 

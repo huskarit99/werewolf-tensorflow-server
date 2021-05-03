@@ -11,7 +11,7 @@ const userRepository = {
 
   //READ
   getUsers() {
-    return User.find({}).catch(() =>
+    return User.find().catch(() =>
       operatorType.FAIL.READ
     );
   },
