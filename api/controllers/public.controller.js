@@ -12,7 +12,7 @@ router.post(
   '/user',
   async (req, res) => {
     const { fullname, username, password } = req.body;
-    const signupResult = userService.signup(fullname, username, password);
+    const signupResult = await userService.signup(fullname, username, password);
     if (!signupResult.isSuccess) {
       res.status(httpStatusCode.CLIENT_ERRORS.BAD_REQUEST)
         .send(signupResult)

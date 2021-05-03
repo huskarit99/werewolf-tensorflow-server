@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 
+import User from "../../models/User.js";
 import operatorType from "../../utils/enums/operatorType.js";
 import jwtGenerator from "../../api/security/jwtGenerator.js";
 import signInValidator from "../../api/validators/signInValidator.js";
@@ -70,8 +71,8 @@ const userService = {
     // Save user to DB
     const salt = await bcrypt.genSalt(10);
     password = await bcrypt.hash(password, salt);
-    user = new User(fullname, username, password);
-    const createUser = await userService.addUser(user);
+    user = new User({ fullname, username, password });
+    const createUser = await userRepository.addUser(user);
     if (createUser === operatorType.FAIL.CREATE)
       return {
         isSuccess: false,
@@ -131,10 +132,12 @@ const userService = {
         code: updateResponseEnum.SERVER_ERROR
       }
     }
-    const salt = await bcrypt.genSalt(10);
-    password = await bcrypt.hash(password, salt);
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      password = await bcrypt.hash(password, salt);
+      user.password = password;
+    }
     user.fullname = fullname;
-    user.password = password;
     const resultUpdateUser = await userRepository.updateUser(user);
     if (resultUpdateUser === operatorType.FAIL.UPDATE)
       return {
