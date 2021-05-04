@@ -1,4 +1,4 @@
 export default {
-  NO_TOKEN: 0,
-  TOKEN_INVALID: 1,
+  NO_TOKEN: 'no_token',
+  TOKEN_INVALID: 'token_invalid',
 }

@@ -71,4 +71,23 @@ router.get(
     res.status(httpStatusCode.SUCCESS.OK).send(resultGetAllUsers);
   });
 
+// @route   GET api/users
+// @desc    Get all users
+// @access  Private
+router.delete(
+  '/user',
+  auth,
+  async (req, res) => {
+    const { username } = req.query;
+    const resultDeleteUser = await userService.deleteUser(username);
+    if (!resultDeleteUser.isSuccess) {
+      res.status(httpStatusCode.FAIL.BAD_REQUEST)
+        .send(resultDeleteUser)
+        .end();
+      return;
+    }
+    res.status(httpStatusCode.SUCCESS.OK)
+      .send(resultDeleteUser);
+  });
+
 export default router;

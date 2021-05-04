@@ -1,8 +1,8 @@
 export default {
-  SUCCESS: 0,
-  USERNAME_IS_EMPTY: 1,
-  PASSWORD_IS_EMPTY: 2,
-  WRONG_USERNAME: 3,
-  WRONG_PASSWORD: 4,
-  SERVER_ERROR: 5
+  SUCCESS: 'signin_success',
+  USERNAME_IS_EMPTY: 'username_is_empty',
+  PASSWORD_IS_EMPTY: 'password_is_empty',
+  WRONG_USERNAME: 'wrong_username',
+  WRONG_PASSWORD: 'wrong_password',
+  SERVER_ERROR: 'server_error'
 }

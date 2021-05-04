@@ -40,10 +40,7 @@ const userService = {
     // Generate Token
     const resultTokenGenerator = await jwtGenerator.createToken(user);
     if (!resultTokenGenerator.isSuccess)
-      return {
-        isSuccess: false,
-        code: resultTokenGenerator.code
-      };
+      return resultTokenGenerator;
     return {
       isSuccess: true,
       username: user.username,
@@ -82,10 +79,7 @@ const userService = {
     user = await userRepository.getUserByUsername(username);
     const resultTokenGenerator = await jwtGenerator.createToken(user);
     if (!resultTokenGenerator.isSuccess)
-      return {
-        isSuccess: false,
-        code: resultTokenGenerator.code
-      };
+      return resultTokenGenerator;
     return {
       isSuccess: true,
       username: user.username,
@@ -161,6 +155,16 @@ const userService = {
       isSuccess: true,
       code: operatorType.SUCCESS.READ,
       users: users
+    }
+  },
+  async deleteUser(username) {
+    const resultDeleteUser = await userRepository.deleteUser(username);
+    if (resultDeleteUser === operatorType.FAIL.DELETE)
+      return {
+        isSuccess: false,
+      }
+    return {
+      isSuccess: true,
     }
   }
 }

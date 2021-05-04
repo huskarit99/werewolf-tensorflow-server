@@ -34,8 +34,10 @@ const userRepository = {
   },
 
   //DELETE
-  deleteUser() {
-
+  deleteUser(username) {
+    return User.deleteOne({ username: username }).catch(() =>
+      operatorType.FAIL.DELETE
+    );
   }
 }
 
