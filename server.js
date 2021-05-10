@@ -2,11 +2,13 @@ import http from 'http';
 import cors from 'cors';
 import express from 'express';
 import passport from 'passport';
+import { Server } from 'socket.io';
 
 import connectDB from "./config/db.js";
 import httpStatusCode from './utils/enums/httpStatusCode.js';
 import publicController from './api/controllers/public.controller.js';
 import privateController from './api/controllers/private.controller.js';
+import initListeners from "./listeners/index.js";
 
 // Init server
 const app = express();
@@ -15,6 +17,10 @@ const server = http.createServer(app);
 
 // Connect DB
 connectDB();
+
+// Init socket
+const io = new Server(server);
+initListeners(io);
 
 // Init middleware
 app.use(express.json());
@@ -51,13 +57,13 @@ app.use((error, req, res, next) => {
   });
 });
 
-
-// Connect socket.io
-import { Server } from 'socket.io';
-const io = new Server(server);
-// import { initSocket } from './utils/socket';
-
-// initSocket({ io });
+// io.on('connection', (socket) => {
+//   // console.log(`[${socket.id}] Client has connected to Socket.IO.`);
+//  
+//   socket.on("onlineListPageFromReact", () => {
+//     io.emit("listOnlinePlayersFromServer", listOnlinePlayers);
+//   })
+// })
 
 server.listen(process.env.PORT || 5000, () =>
   console.log(`Server has started.`)
