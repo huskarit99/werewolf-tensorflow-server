@@ -1,13 +1,18 @@
-import jwt from 'jsonwebtoken';
-import userRepository from '../data/repositories/user.repository.js';
-
 export default (io, socket, listOnlinePlayers, checkOnlineUsers) => {
-  socket.on("react:disconnect-server", async ({ token }) => {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const id = decoded.user.id;
-    const user = await userRepository.getUserById(id);
-
-    io.emit("listOnlinePlayersFromServer", listOnlinePlayers);
-    checkOnlineUsers[user.username] = null;
+  socket.on("disconnect", async () => {
+    const username = checkOnlineUsers[socket.id];
+    if (!listOnlinePlayers || !username || listOnlinePlayers.length === 0 || username === "")
+      return;
+    const index = listOnlinePlayers.findIndex(player => player.username === username);
+    listOnlinePlayers.splice(index, 1);
+    io.emit("server:list-online-players", listOnlinePlayers);
+    checkOnlineUsers[username] = null;
+  })
+  socket.on("react:disconnect-server", async () => {
+    const username = checkOnlineUsers[socket.id];
+    const index = listOnlinePlayers.findIndex(player => player.username === username);
+    listOnlinePlayers.splice(index, 1);
+    io.emit("server:list-online-players", listOnlinePlayers);
+    checkOnlineUsers[username] = null;
   })
 }

@@ -11,7 +11,8 @@ export default (io, socket, listOnlinePlayers, checkOnlineUsers) => {
         username: user.username,
         fullname: user.fullname
       });
-    io.emit("listOnlinePlayersFromServer", listOnlinePlayers);
-    checkOnlineUsers[user.username] = id;
+    io.emit("server:list-online-players", listOnlinePlayers);
+    checkOnlineUsers[user.username] = socket.id;
+    checkOnlineUsers[socket.id] = user.username;
   })
 }
