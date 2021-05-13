@@ -1,4 +1,4 @@
-import reactRemoveRoom from "./react.remove-room.js";
+import reactLeaveRoom from "./react.leave-room.js";
 import reactCreateRoom from "./react.create-room.js";
 import reactGetListRoom from "./react.get-list-room.js";
 import reactConnectServer from "./react.connect-server.js";
@@ -52,13 +52,15 @@ const listRoom = [];
     name,
     maxPlayerInRoom,
     numberOfPlayersInRoom,
-    fullnameOfHost,
-    usernameOfHost,
     totalCharacter,
     wolf,
     mage,
     guard,
-    hunter
+    hunter,
+    member: [{
+      username,
+      fullname
+    }]
   }
 }
 </value>
