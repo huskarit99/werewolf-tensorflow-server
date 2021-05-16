@@ -8,7 +8,7 @@ export default (io, socket, listRoom, rooms) => {
     } else {
       const indexPlayerinRoom = rooms[id].member.findIndex(player => player.usernamer === usernameOfPlayer);
       rooms[id].member.splice(indexPlayerinRoom, 1);
-      socket.to(id).emit("server:detail-room", rooms);
+      socket.to(id).emit("server:update-room", rooms);
     }
     socket.emit("server:force-get-out-room");
     io.emit("server:list-room", listRoom);

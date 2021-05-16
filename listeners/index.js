@@ -1,9 +1,10 @@
+import reactListRoom from "./react.list-room.js";
+import reactJoinRoom from "./react.join-room.js";
 import reactLeaveRoom from "./react.leave-room.js";
 import reactCreateRoom from "./react.create-room.js";
-import reactGetListRoom from "./react.get-list-room.js";
 import reactConnectServer from "./react.connect-server.js";
 import reactDisconnectServer from "./react.disconnect-server.js";
-import reactGetListOnlinePlayers from "./react.get-list-online-players.js";
+import reactListOnlinePlayers from "./react.list-online-players.js";
 /*
 <summary> List Online Players to render in Clinet-side  </summary>
 <value>
@@ -30,15 +31,8 @@ const checkOnlineUsers = {};
 [{
   id,
   name,
-  maxPlayerInRoom,
   numberOfPlayersInRoom,
-  fullnameOfHost,
   usernameOfHost,
-  totalCharacter,
-  wolf,
-  mage,
-  guard,
-  hunter 
 }]
 </value>
 */
@@ -50,16 +44,13 @@ const listRoom = [];
 {
   roomId -> {
     name,
-    maxPlayerInRoom,
-    numberOfPlayersInRoom,
-    totalCharacter,
     wolf,
     mage,
     guard,
     hunter,
     member: [{
       username,
-      fullname
+      fullname,
     }]
   }
 }
@@ -67,13 +58,22 @@ const listRoom = [];
 */
 const rooms = {};
 
+/*
+<summary>Check whether user stayed in any room or not</summary>
+<value>
+  mapping from username to roomId
+</value>
+*/
+const checkUserInRoom = {};
+
 export default io => {
   io.on("connection", socket => {
-    reactGetListRoom(socket, listRoom);
-    reactRemoveRoom(io, socket, listRoom, rooms);
-    reactCreateRoom(io, socket, listRoom, rooms);
-    reactGetListOnlinePlayers(socket, listOnlinePlayers);
+    reactListRoom(socket, listRoom);
+    reactJoinRoom(io, socket, listRoom, rooms);
+    reactLeaveRoom(io, socket, listRoom, rooms);
+    reactCreateRoom(io, socket, listRoom, rooms, checkUserInRoom);
+    reactListOnlinePlayers(socket, listOnlinePlayers);
     reactConnectServer(io, socket, listOnlinePlayers, checkOnlineUsers);
-    reactDisconnectServer(io, socket, listOnlinePlayers, checkOnlineUsers);
+    reactDisconnectServer(io, socket, listOnlinePlayers, checkOnlineUsers, listRoom, rooms, checkUserInRoom);
   })
 }
