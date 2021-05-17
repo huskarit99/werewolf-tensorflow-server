@@ -1,6 +1,7 @@
 import reactListRoom from "./react.list-room.js";
 import reactJoinRoom from "./react.join-room.js";
 import reactLeaveRoom from "./react.leave-room.js";
+import reactDetailRoom from "./react.detail-room.js";
 import reactCreateRoom from "./react.create-room.js";
 import reactConnectServer from "./react.connect-server.js";
 import reactDisconnectServer from "./react.disconnect-server.js";
@@ -69,6 +70,7 @@ const checkUserInRoom = {};
 export default io => {
   io.on("connection", socket => {
     reactListRoom(socket, listRoom);
+    reactDetailRoom(socket, rooms);
     reactJoinRoom(io, socket, listRoom, rooms);
     reactLeaveRoom(io, socket, listRoom, rooms);
     reactCreateRoom(io, socket, listRoom, rooms, checkUserInRoom);

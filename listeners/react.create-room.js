@@ -1,4 +1,4 @@
-export default (io, socket, listRoom, rooms) => {
+export default (io, socket, listRoom, rooms, checkUserInRoom) => {
   socket.on("react:create-room",
     ({ id,
       name,
@@ -24,6 +24,7 @@ export default (io, socket, listRoom, rooms) => {
       });
       io.emit("server:list-room", listRoom);
       socket.emit("server:get-in-room", rooms[id]);
+      socket.to(id).emit("server:update-room", rooms[id]);
       socket.join(id);
       checkUserInRoom[usernameOfHost] = id;
     }
