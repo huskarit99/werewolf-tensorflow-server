@@ -46,20 +46,22 @@ export default (io, socket, listOnlinePlayers, checkOnlineUsers, listRoom, rooms
         // Find index of room in list room
         const indexRoom = listRoom.findIndex(room => room.id === roomId);
         if (rooms[roomId].member[0].username === username) {
+          // If user is host, room is going to be removed and everyone in room is forced to get out
           socket.to(roomId).emit("server:force-get-out-room");
           listRoom.splice(indexRoom, 1);
           rooms[roomId] = null;
         } else {
+          // Remove this player from room
           const indexPlayerinRoom = rooms[roomId].member.findIndex(player => player.username === username);
           rooms[roomId].member.splice(indexPlayerinRoom, 1);
+          // Notify all players in the same room
           socket.to(roomId).emit("server:update-room", rooms[roomId]);
+          // Update number of players in room
+          listRoom[indexRoom].numberOfPlayersInRoom = rooms[roomId].member.length;
         }
+        // Notify all
         io.emit("server:list-room", listRoom);
       }
-    } else {
-      checkUserInRoom[user.username] = null;
-      socket.to(roomId).emit("server:force-get-out-room");
-      socket.emit("server:force-get-out-room");
     }
   })
 }
