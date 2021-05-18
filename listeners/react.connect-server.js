@@ -21,6 +21,7 @@ export default (io, socket, listOnlinePlayers, checkOnlineUsers, rooms, checkUse
     const roomId = checkUserInRoom[user.username];
     if (roomId) {
       socket.join(roomId);
+      // Check this room is available
       if (rooms[roomId]) {
         const indexPlayerinRoom = rooms[roomId].member.findIndex(player => player.username === user.username);
         // Mark offline this player in room

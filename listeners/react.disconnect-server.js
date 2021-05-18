@@ -43,6 +43,8 @@ export default (io, socket, listOnlinePlayers, checkOnlineUsers, listRoom, rooms
       // Check this room is available
       if (rooms[roomId]) {
         checkUserInRoom[username] = null;
+        // Find index of room in list room
+        const indexRoom = listRoom.findIndex(room => room.id === roomId);
         if (rooms[roomId].member[0].username === username) {
           socket.to(roomId).emit("server:force-get-out-room");
           listRoom.splice(indexRoom, 1);

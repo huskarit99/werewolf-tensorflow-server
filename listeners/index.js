@@ -7,7 +7,7 @@ import reactConnectServer from "./react.connect-server.js";
 import reactDisconnectServer from "./react.disconnect-server.js";
 import reactListOnlinePlayers from "./react.list-online-players.js";
 /*
-<summary> List Online Players to render in Clinet-side  </summary>
+<summary>List Online Players to render in Clinet-side</summary>
 <value>
 [{
   username,
@@ -70,12 +70,12 @@ const checkUserInRoom = {};
 
 export default io => {
   io.on("connection", socket => {
+    reactDetailRoom(socket, rooms, checkUserInRoom);
     reactListRoom(socket, listRoom);
-    reactDetailRoom(socket, rooms);
+    reactListOnlinePlayers(socket, listOnlinePlayers);
     reactJoinRoom(io, socket, listRoom, rooms, checkUserInRoom);
     reactLeaveRoom(io, socket, listRoom, rooms, checkUserInRoom);
     reactCreateRoom(io, socket, listRoom, rooms, checkUserInRoom);
-    reactListOnlinePlayers(socket, listOnlinePlayers);
     reactConnectServer(io, socket, listOnlinePlayers, checkOnlineUsers, rooms, checkUserInRoom);
     reactDisconnectServer(io, socket, listOnlinePlayers, checkOnlineUsers, listRoom, rooms, checkUserInRoom);
   })
