@@ -1,4 +1,4 @@
-export default (io, socket, listRoom, rooms) => {
+export default (io, socket, listRoom, rooms, checkUserInRoom) => {
   socket.on("react:leave-room", ({ id, usernameOfPlayer }) => {
     const indexRoom = listRoom.findIndex(room => room.id === id);
     if (rooms[id].member[0].username === usernameOfPlayer) {
@@ -12,5 +12,6 @@ export default (io, socket, listRoom, rooms) => {
     }
     socket.emit("server:force-get-out-room");
     io.emit("server:list-room", listRoom);
+    checkUserInRoom[usernameOfPlayer] = null;
   })
 }

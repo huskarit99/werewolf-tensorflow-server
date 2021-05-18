@@ -57,14 +57,6 @@ app.use((error, req, res, next) => {
   });
 });
 
-// io.on('connection', (socket) => {
-//   // console.log(`[${socket.id}] Client has connected to Socket.IO.`);
-//  
-//   socket.on("onlineListPageFromReact", () => {
-//     io.emit("listOnlinePlayersFromServer", listOnlinePlayers);
-//   })
-// })
-
 server.listen(process.env.PORT || 5000, () =>
   console.log(`Server has started.`)
 );

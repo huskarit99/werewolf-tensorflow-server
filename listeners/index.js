@@ -52,6 +52,7 @@ const listRoom = [];
     member: [{
       username,
       fullname,
+      isOnline
     }]
   }
 }
@@ -71,11 +72,11 @@ export default io => {
   io.on("connection", socket => {
     reactListRoom(socket, listRoom);
     reactDetailRoom(socket, rooms);
-    reactJoinRoom(io, socket, listRoom, rooms);
-    reactLeaveRoom(io, socket, listRoom, rooms);
+    reactJoinRoom(io, socket, listRoom, rooms, checkUserInRoom);
+    reactLeaveRoom(io, socket, listRoom, rooms, checkUserInRoom);
     reactCreateRoom(io, socket, listRoom, rooms, checkUserInRoom);
     reactListOnlinePlayers(socket, listOnlinePlayers);
-    reactConnectServer(io, socket, listOnlinePlayers, checkOnlineUsers);
+    reactConnectServer(io, socket, listOnlinePlayers, checkOnlineUsers, rooms, checkUserInRoom);
     reactDisconnectServer(io, socket, listOnlinePlayers, checkOnlineUsers, listRoom, rooms, checkUserInRoom);
   })
 }
