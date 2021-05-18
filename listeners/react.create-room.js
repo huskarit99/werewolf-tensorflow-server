@@ -25,7 +25,6 @@ export default (io, socket, listRoom, rooms, checkUserInRoom) => {
       });
       io.emit("server:list-room", listRoom);
       socket.emit("server:get-in-room", rooms[id]);
-      socket.to(id).emit("server:update-room", rooms[id]);
       socket.join(id);
       checkUserInRoom[usernameOfHost] = id;
     }
