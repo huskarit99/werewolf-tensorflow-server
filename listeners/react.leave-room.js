@@ -11,7 +11,7 @@ export default (io, socket, listRoom, rooms, checkUserInRoom) => {
       rooms[id] = null;
     } else {
       // Remove this player from room
-      const indexPlayerinRoom = rooms[id].member.findIndex(player => player.usernamer === usernameOfPlayer);
+      const indexPlayerinRoom = rooms[id].member.findIndex(player => player.username === usernameOfPlayer);
       rooms[id].member.splice(indexPlayerinRoom, 1);
       // Notify all players in the same room
       socket.to(id).emit("server:update-room", rooms);

@@ -6,6 +6,7 @@ export default (io, socket, listRoom, rooms, checkUserInRoom) => {
       usernameOfHost,
     }) => {
       rooms[id] = {
+        id: id,
         name: name,
         wolf: 1,
         mage: 0,

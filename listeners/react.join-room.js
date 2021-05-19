@@ -22,9 +22,7 @@ export default (io, socket, listRoom, rooms, checkUserInRoom) => {
         socket.to(id).emit("server:update-room", rooms[id]);
         checkUserInRoom[usernameOfPlayer] = id;
       } else {
-        socket.emit("server:error-join-room", {
-          isSuccess: false
-        })
+        socket.emit("server:error-join-room");
       }
     })
 }
