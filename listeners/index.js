@@ -3,6 +3,7 @@ import reactJoinRoom from "./react.join-room.js";
 import reactLeaveRoom from "./react.leave-room.js";
 import reactDetailRoom from "./react.detail-room.js";
 import reactCreateRoom from "./react.create-room.js";
+import reactSendMessage from "./react.send-message.js";
 import reactConnectServer from "./react.connect-server.js";
 import reactDisconnectServer from "./react.disconnect-server.js";
 import reactListOnlinePlayers from "./react.list-online-players.js";
@@ -41,7 +42,7 @@ const checkOnlineUsers = {};
 const listRoom = [];
 
 /*
-<summary>Mapping from roomId to the detail room</summary>
+<summary>Mapping from roomId to the detail room and Save messages of member in Room</summary>
 <value>
 {
   roomId -> {
@@ -54,6 +55,10 @@ const listRoom = [];
       username,
       fullname,
       isOnline
+    }],
+    messages: [{
+      username,
+      message
     }]
   }
 }
@@ -73,6 +78,7 @@ export default io => {
   io.on("connection", socket => {
     reactListRoom(socket, listRoom);
     reactDetailRoom(socket, rooms, checkUserInRoom);
+    reactSendMessage(socket, rooms, checkUserInRoom);
     reactListOnlinePlayers(socket, listOnlinePlayers);
     reactJoinRoom(io, socket, listRoom, rooms, checkUserInRoom);
     reactLeaveRoom(io, socket, listRoom, rooms, checkUserInRoom);

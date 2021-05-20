@@ -16,7 +16,8 @@ export default (io, socket, listRoom, rooms, checkUserInRoom) => {
           username: usernameOfHost,
           fullname: fullnameOfHost,
           isOnline: true
-        }]
+        }],
+        messages: []
       };
       listRoom.push({
         id: id,
