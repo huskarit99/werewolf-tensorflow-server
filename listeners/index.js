@@ -1,6 +1,7 @@
 import reactListRoom from "./react.list-room.js";
 import reactJoinRoom from "./react.join-room.js";
 import reactLeaveRoom from "./react.leave-room.js";
+import reactUpdateRule from "./react.update-rule.js";
 import reactDetailRoom from "./react.detail-room.js";
 import reactCreateRoom from "./react.create-room.js";
 import reactSendMessage from "./react.send-message.js";
@@ -74,8 +75,9 @@ const rooms = {};
 */
 const checkUserInRoom = {};
 
-export default io => {
-  io.on("connection", socket => {
+export default (io) => {
+  io.on("connection", (socket) => {
+    reactUpdateRule(socket, rooms);
     reactListRoom(socket, listRoom);
     reactDetailRoom(socket, rooms, checkUserInRoom);
     reactSendMessage(socket, rooms, checkUserInRoom);
@@ -83,8 +85,30 @@ export default io => {
     reactJoinRoom(io, socket, listRoom, rooms, checkUserInRoom);
     reactLeaveRoom(io, socket, listRoom, rooms, checkUserInRoom);
     reactCreateRoom(io, socket, listRoom, rooms, checkUserInRoom);
-    reactHostForceLeaveRoom(io, socket, listRoom, rooms, checkUserInRoom, checkOnlineUsers);
-    reactConnectServer(io, socket, listOnlinePlayers, checkOnlineUsers, rooms, checkUserInRoom);
-    reactDisconnectServer(io, socket, listOnlinePlayers, checkOnlineUsers, listRoom, rooms, checkUserInRoom);
-  })
-}
+    reactHostForceLeaveRoom(
+      io,
+      socket,
+      listRoom,
+      rooms,
+      checkUserInRoom,
+      checkOnlineUsers
+    );
+    reactConnectServer(
+      io,
+      socket,
+      listOnlinePlayers,
+      checkOnlineUsers,
+      rooms,
+      checkUserInRoom
+    );
+    reactDisconnectServer(
+      io,
+      socket,
+      listOnlinePlayers,
+      checkOnlineUsers,
+      listRoom,
+      rooms,
+      checkUserInRoom
+    );
+  });
+};

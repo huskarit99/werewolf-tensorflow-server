@@ -1,23 +1,22 @@
 export default (io, socket, listRoom, rooms, checkUserInRoom) => {
-  socket.on("react:create-room",
-    ({ id,
-      name,
-      fullnameOfHost,
-      usernameOfHost,
-    }) => {
+  socket.on(
+    "react:create-room",
+    ({ id, name, fullnameOfHost, usernameOfHost }) => {
       rooms[id] = {
         id: id,
         name: name,
         wolf: 1,
-        mage: 0,
-        guard: 0,
-        hunter: 0,
-        member: [{
-          username: usernameOfHost,
-          fullname: fullnameOfHost,
-          isOnline: true
-        }],
-        messages: []
+        witch: 1,
+        guard: 1,
+        hunter: 1,
+        member: [
+          {
+            username: usernameOfHost,
+            fullname: fullnameOfHost,
+            isOnline: true,
+          },
+        ],
+        messages: [],
       };
       listRoom.push({
         id: id,
@@ -30,5 +29,5 @@ export default (io, socket, listRoom, rooms, checkUserInRoom) => {
       socket.join(id);
       checkUserInRoom[usernameOfHost] = id;
     }
-  )
-}
+  );
+};
