@@ -6,6 +6,8 @@ import reactUpdateRule from "./react.update-rule.js";
 import reactDetailRoom from "./react.detail-room.js";
 import reactCreateRoom from "./react.create-room.js";
 import reactSendMessage from "./react.send-message.js";
+import reactDetectFinger from "./react.detect-finger.js";
+import unityConnectServer from "./unity.connect-server.js";
 import reactConnectServer from "./react.connect-server.js";
 import reactDisconnectServer from "./react.disconnect-server.js";
 import reactListOnlinePlayers from "./react.list-online-players.js";
@@ -29,6 +31,15 @@ mapping from username -> socket.id
 </value>
 */
 const checkOnlineUsers = {};
+
+/*
+<summary>Mapping username of User to socket id of Unity</summary>
+<value>
+mapping from socket.id unity -> username
+mapping from username -> socket.id unity
+</value>
+*/
+const mappingUnity = {};
 
 /*
 <summary>List Room to render in Client-side</summary>
@@ -80,7 +91,9 @@ export default (io) => {
   io.on("connection", (socket) => {
     reactUpdateRule(socket, rooms);
     reactListRoom(socket, listRoom);
+    unityConnectServer(socket, mappingUnity);
     reactPlayGame(io, socket, rooms, listRoom);
+    reactDetectFinger(io, socket, mappingUnity);
     reactDetailRoom(socket, rooms, checkUserInRoom);
     reactSendMessage(socket, rooms, checkUserInRoom);
     reactListOnlinePlayers(socket, listOnlinePlayers);
