@@ -1,5 +1,6 @@
 import reactListRoom from "./react.list-room.js";
 import reactJoinRoom from "./react.join-room.js";
+import reactPlayGame from "./react.play-game.js";
 import reactLeaveRoom from "./react.leave-room.js";
 import reactUpdateRule from "./react.update-rule.js";
 import reactDetailRoom from "./react.detail-room.js";
@@ -79,6 +80,7 @@ export default (io) => {
   io.on("connection", (socket) => {
     reactUpdateRule(socket, rooms);
     reactListRoom(socket, listRoom);
+    reactPlayGame(io, socket, rooms, listRoom);
     reactDetailRoom(socket, rooms, checkUserInRoom);
     reactSendMessage(socket, rooms, checkUserInRoom);
     reactListOnlinePlayers(socket, listOnlinePlayers);

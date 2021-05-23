@@ -9,6 +9,7 @@ export default (io, socket, listRoom, rooms, checkUserInRoom) => {
         witch: 1,
         guard: 1,
         hunter: 1,
+        isPlaying: 0,
         member: [
           {
             username: usernameOfHost,
@@ -21,6 +22,7 @@ export default (io, socket, listRoom, rooms, checkUserInRoom) => {
       listRoom.push({
         id: id,
         name: name,
+        isPlaying: 0,
         numberOfPlayersInRoom: rooms[id].member.length,
         usernameOfHost: usernameOfHost,
       });
