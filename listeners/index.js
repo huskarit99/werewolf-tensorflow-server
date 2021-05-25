@@ -91,9 +91,9 @@ export default (io) => {
   io.on("connection", (socket) => {
     reactUpdateRule(socket, rooms);
     reactListRoom(socket, listRoom);
-    unityConnectServer(socket, mappingUnity);
     reactPlayGame(io, socket, rooms, listRoom);
     reactDetectFinger(io, socket, mappingUnity);
+    unityConnectServer(socket, mappingUnity, checkUserInRoom, rooms);
     reactDetailRoom(socket, rooms, checkUserInRoom);
     reactSendMessage(socket, rooms, checkUserInRoom);
     reactListOnlinePlayers(socket, listOnlinePlayers);
