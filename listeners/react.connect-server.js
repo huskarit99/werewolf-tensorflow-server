@@ -1,7 +1,14 @@
-import jwt from 'jsonwebtoken';
-import userRepository from '../data/repositories/user.repository.js';
+import jwt from "jsonwebtoken";
+import userRepository from "../data/repositories/user.repository.js";
 
-export default (io, socket, listOnlinePlayers, checkOnlineUsers, rooms, checkUserInRoom) => {
+export default (
+  io,
+  socket,
+  listOnlinePlayers,
+  checkOnlineUsers,
+  rooms,
+  checkUserInRoom
+) => {
   socket.on("react:connect-server", async ({ token }) => {
     // Identify and get info user by token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -11,7 +18,7 @@ export default (io, socket, listOnlinePlayers, checkOnlineUsers, rooms, checkUse
     if (!checkOnlineUsers || !checkOnlineUsers[user.username])
       listOnlinePlayers.push({
         username: user.username,
-        fullname: user.fullname
+        fullname: user.fullname,
       });
     // Notify all
     io.emit("server:list-online-players", listOnlinePlayers);
@@ -23,7 +30,13 @@ export default (io, socket, listOnlinePlayers, checkOnlineUsers, rooms, checkUse
       socket.join(roomId);
       // Check this room is available
       if (rooms[roomId]) {
-        const indexPlayerinRoom = rooms[roomId].member.findIndex(player => player.username === user.username);
+        rooms[roomId].messages.push({
+          username: "admin",
+          message: user.username + " reconnected",
+        });
+        const indexPlayerinRoom = rooms[roomId].member.findIndex(
+          (player) => player.username === user.username
+        );
         // Mark offline this player in room
         rooms[roomId].member[indexPlayerinRoom].isOnline = true;
         // Notify player in the same room that this player is offline
@@ -36,5 +49,5 @@ export default (io, socket, listOnlinePlayers, checkOnlineUsers, rooms, checkUse
         socket.emit("server:force-get-out-room");
       }
     }
-  })
-}
+  });
+};

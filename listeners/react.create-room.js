@@ -19,6 +19,11 @@ export default (io, socket, listRoom, rooms, checkUserInRoom) => {
         ],
         messages: [],
       };
+      rooms[id].messages.push({
+        username: "admin",
+        message:
+          usernameOfHost + ", You created the room. Now, you are the host",
+      });
       listRoom.push({
         id: id,
         name: name,
