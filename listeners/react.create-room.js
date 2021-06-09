@@ -6,9 +6,9 @@ export default (io, socket, listRoom, rooms, checkUserInRoom) => {
         id: id,
         name: name,
         wolf: 1,
-        witch: 1,
-        guard: 1,
-        hunter: 1,
+        witch: 0,
+        guard: 0,
+        hunter: 0,
         isPlaying: 0,
         member: [
           {
