@@ -1,8 +1,15 @@
-const http = require('http');
-const express = require('express');
-const cors = require('cors');
-const passport = require('passport');
-const connectDB = require('./config/db');
+import http from "http";
+import cors from "cors";
+import express from "express";
+import passport from "passport";
+import Server from "socket.io";
+// const { Server } = pkg;
+
+import connectDB from "./config/db.js";
+import httpStatusCode from "./utils/enums/httpStatusCode.js";
+import publicController from "./api/controllers/public.controller.js";
+import privateController from "./api/controllers/private.controller.js";
+import initListeners from "./listeners/index.js";
 
 // Init server
 const app = express();
@@ -12,34 +19,48 @@ const server = http.createServer(app);
 // Connect DB
 connectDB();
 
+// Init socket
+const io = Server(server);
+initListeners(io);
+
 // Init middleware
 app.use(express.json());
 
-app.use(function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header(
-        'Access-Control-Allow-Headers',
-        'Origin,X-Requested-With,Content-Type,Accept,Authorization'
-    );
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin,X-Requested-With,Content-Type,Accept,Authorization"
+  );
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
 
-    next();
+  next();
 });
 app.use(passport.initialize());
 
 //Define routes
-app.use('/api/users', require('./routes/users'));
-app.use('/api/auth', require('./routes/auth'));
+app.use("/api/public-controller", publicController);
+app.use("/api/private-controller", privateController);
 
-// Connect socket.io
-const socketio = require('socket.io');
-const options = { /*... */ };
-const io = socketio(server, options);
-const { initSocket } = require('./utils/socket');
+app.use((req, res, next) => {
+  const error = new Error("Not found");
+  error.status = httpStatusCode.CLIENT_ERRORS.BAD_REQUEST;
+  next(error);
+});
 
-initSocket({ io });
+app.use((error, req, res, next) => {
+  res
+    .status(error.status || httpStatusCode.SERVER_ERRORS.INTERNAL_SERVER_ERROR)
+    .send({
+      error: {
+        status:
+          error.status || httpStatusCode.SERVER_ERRORS.INTERNAL_SERVER_ERROR,
+        message: error.message || "Internal Server Error",
+      },
+    });
+});
 
 server.listen(process.env.PORT || 5000, () =>
-    console.log(`Server has started.`)
+  console.log(`Server has started.`)
 );
